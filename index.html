@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduVault — College Resource Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Sentient:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#1a1208;--ink2:#2d2416;--saffron:#e8880a;--saf-light:#fdf3e0;
+  --saf-glow:rgba(232,136,10,.18);--mint:#1cb87e;--mint-bg:rgba(28,184,126,.1);
+  --cream:#faf8f4;--white:#ffffff;--border:#ede8de;--muted:#8a7e6a;
+  --red:#e84040;--blue:#2563eb;--r:14px;--r-lg:20px;
+  --shadow:0 4px 20px rgba(26,18,8,.08);--shadow-lg:0 12px 48px rgba(26,18,8,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;}
+body{font-family:'Sentient',Georgia,serif;background:var(--cream);color:var(--ink);line-height:1.6;overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;font-family:inherit;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ── SETUP ── */
+#setup-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:2rem 1rem;}
+.setup-card{background:var(--ink2);border:1px solid rgba(255,255,255,.08);border-radius:var(--r-lg);padding:2.5rem;width:100%;max-width:560px;box-shadow:0 32px 80px rgba(0,0,0,.4);}
+.setup-logo{text-align:center;margin-bottom:1.75rem;}
+.setup-logo .icon{width:60px;height:60px;background:var(--saffron);border-radius:var(--r);display:inline-flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:.75rem;}
+.setup-logo h1{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:1.9rem;color:#fff;letter-spacing:-.02em;}
+.setup-logo p{color:rgba(255,255,255,.45);font-size:.9rem;margin-top:.25rem;}
+.free-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(28,184,126,.15);border:1px solid rgba(28,184,126,.3);color:#4ade80;border-radius:999px;padding:.3rem .9rem;font-size:.8rem;font-weight:700;margin-bottom:1.25rem;}
+.setup-steps{background:rgba(255,255,255,.04);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;border:1px solid rgba(255,255,255,.07);}
+.setup-steps p{font-size:.82rem;color:rgba(255,255,255,.5);line-height:2.1;}
+.setup-steps a{color:var(--saffron);}
+.setup-steps strong{color:rgba(255,255,255,.8);}
+.s-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.4rem;display:block;}
+.s-input{width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.65rem .9rem;color:#fff;font-family:'Sentient',serif;font-size:.88rem;outline:none;margin-bottom:.75rem;transition:border-color .2s;}
+.s-input:focus{border-color:var(--saffron);}
+.s-input::placeholder{color:rgba(255,255,255,.2);}
+.btn-connect{width:100%;padding:.9rem;background:var(--saffron);color:#fff;border:none;border-radius:10px;font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:1rem;letter-spacing:.02em;transition:all .2s;margin-top:.25rem;}
+.btn-connect:hover{background:#d4790a;transform:translateY(-1px);}
+
+/* ── AUTH ── */
+#auth-screen{display:none;min-height:100vh;background:linear-gradient(135deg,var(--ink) 0%,#2d1a00 100%);align-items:center;justify-content:center;padding:2rem 1rem;}
+.auth-split{display:flex;max-width:880px;width:100%;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);}
+.auth-left{flex:1;background:var(--saffron);padding:3rem 2.5rem;display:none;flex-direction:column;justify-content:center;}
+@media(min-width:760px){.auth-left{display:flex;}}
+.auth-left h2{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:2.2rem;color:#fff;line-height:1.1;letter-spacing:-.02em;margin-bottom:1rem;}
+.auth-left p{color:rgba(255,255,255,.75);font-size:.95rem;}
+.feature-rows{margin-top:1.75rem;display:flex;flex-direction:column;gap:.75rem;}
+.feat-row{display:flex;align-items:center;gap:.75rem;background:rgba(255,255,255,.15);border-radius:10px;padding:.65rem .9rem;}
+.feat-row span:first-child{font-size:1.1rem;}
+.feat-row span:last-child{font-size:.85rem;color:rgba(255,255,255,.9);font-weight:500;}
+.auth-right{flex:0 0 380px;background:var(--white);padding:2.5rem 2rem;}
+@media(max-width:759px){.auth-right{flex:1;}}
+.auth-right h3{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:.25rem;}
+.auth-right p{color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;}
+.tab-row{display:flex;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:1.5rem;}
+.tab-btn{flex:1;padding:.55rem;background:transparent;border:none;font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:.88rem;color:var(--muted);transition:all .18s;}
+.tab-btn.active{background:var(--ink);color:#fff;}
+.form-group{margin-bottom:1rem;}
+.f-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;}
+.f-input,.f-select{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Sentient',serif;font-size:.92rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .2s;}
+.f-input:focus,.f-select:focus{border-color:var(--saffron);box-shadow:0 0 0 3px var(--saf-glow);}
+.f-input::placeholder{color:#c5b99a;}
+.btn-auth{width:100%;padding:.8rem;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:.95rem;transition:all .2s;margin-top:.5rem;}
+.btn-auth:hover{background:var(--ink2);transform:translateY(-1px);}
+.btn-auth:disabled{opacity:.5;transform:none;}
+.auth-err{background:#fef2f2;border:1px solid #fecaca;color:var(--red);border-radius:8px;padding:.65rem .9rem;font-size:.82rem;margin-bottom:.9rem;display:none;}
+
+/* ── APP ── */
+#app-screen{display:none;min-height:100vh;flex-direction:column;}
+.navbar{background:var(--ink);position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.2);}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 1.5rem;height:62px;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.nav-brand{display:flex;align-items:center;gap:.6rem;font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:1.25rem;letter-spacing:-.02em;color:#fff;}
+.nav-brand .dot{width:32px;height:32px;background:var(--saffron);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.nav-links{display:flex;align-items:center;gap:.25rem;}
+.nav-link{padding:.4rem .85rem;border-radius:8px;font-family:'Cabinet Grotesk',sans-serif;font-weight:600;font-size:.85rem;color:rgba(255,255,255,.6);transition:all .18s;border:none;background:transparent;display:flex;align-items:center;gap:.35rem;}
+.nav-link:hover,.nav-link.active{background:rgba(255,255,255,.1);color:#fff;}
+.nav-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:.85rem;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.15);flex-shrink:0;}
+.page-wrap{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;flex:1;}
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.dash-header{margin-bottom:2rem;}
+.dash-header h1{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-.02em;}
+.dash-header p{color:var(--muted);font-size:.95rem;margin-top:.2rem;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2rem;}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;box-shadow:var(--shadow);}
+.stat-box .s-icon{font-size:1.6rem;margin-bottom:.4rem;}
+.stat-box .s-val{font-family:'Cabinet Grotesk',sans-serif;font-weight:900;font-size:2rem;line-height:1;color:var(--ink);}
+.stat-box .s-lbl{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:.2rem;}
+.quick-acts{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.section-title{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;}
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.1rem;}
+.res-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .2s ease;display:flex;flex-direction:column;}
+.res-card:hover{box-shadow:var(--shadow);transform:translateY(-2px);}
+.res-card-top{padding:1.1rem 1.1rem .7rem;flex:1;}
+.res-card-bot{padding:.75rem 1.1rem .9rem;border-top:1px solid #f5f1ea;display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
+.res-icon{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:.7rem;}
+.ri-pdf{background:#fef2f2;}.ri-doc{background:#eff6ff;}.ri-ppt{background:#fff7ed;}.ri-img{background:#f0fdf4;}.ri-other{background:#f5f3ff;}
+.res-title{font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.35rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.res-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
+.chip{display:inline-flex;align-items:center;padding:.18rem .6rem;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.02em;}
+.chip-saf{background:var(--saf-light);color:#92400e;}.chip-ink{background:#e8e4dc;color:var(--ink2);}.chip-mint{background:var(--mint-bg);color:#065f46;}.chip-blue{background:#dbeafe;color:#1e40af;}
+.res-desc{font-size:.8rem;color:var(--muted);margin-top:.4rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.res-meta-info{font-size:.76rem;color:#b0a393;line-height:1.8;}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.1rem;border-radius:8px;border:none;font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:.85rem;transition:all .18s;text-decoration:none;}
+.btn-primary{background:var(--ink);color:#fff;}.btn-primary:hover{background:var(--ink2);transform:translateY(-1px);}
+.btn-saffron{background:var(--saffron);color:#fff;}.btn-saffron:hover{background:#d4790a;transform:translateY(-1px);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--ink);}.btn-outline:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
+.btn-ghost{background:transparent;color:var(--muted);border:none;}.btn-ghost:hover{background:var(--border);color:var(--ink);}
+.btn-danger{background:#fef2f2;color:var(--red);border:1px solid #fecaca;}.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:.35rem .75rem;font-size:.78rem;}.btn-lg{padding:.8rem 1.8rem;font-size:.95rem;}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important;}
+.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:1.25rem;box-shadow:var(--shadow);display:flex;flex-wrap:wrap;gap:.65rem;align-items:flex-end;}
+.fb-group{display:flex;flex-direction:column;gap:.3rem;}
+.fb-group label{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
+.fb-group input,.fb-group select{padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Sentient',serif;font-size:.88rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .18s;}
+.fb-group input:focus,.fb-group select:focus{border-color:var(--saffron);}
+.fb-search{flex:3;min-width:200px;}
+.fb-search-wrap{position:relative;}
+.fb-search-wrap input{padding-left:2.2rem;}
+.fb-search-wrap::before{content:'🔍';position:absolute;left:.65rem;top:50%;transform:translateY(-50%);font-size:.85rem;pointer-events:none;}
+.results-count{font-size:.82rem;color:var(--muted);margin-bottom:.9rem;}
+.upload-wrap{max-width:640px;margin:0 auto;}
+.upload-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:2rem;box-shadow:var(--shadow);}
+.drop-zone{border:2px dashed var(--border);border-radius:var(--r);padding:2.25rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:1.25rem;background:#fdfcfa;position:relative;overflow:hidden;}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--saffron);background:var(--saf-light);}
+.drop-zone.has-file{border-color:var(--mint);border-style:solid;background:var(--mint-bg);}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-icon{font-size:2.2rem;margin-bottom:.6rem;}
+.dz-text{font-size:.88rem;color:var(--muted);}
+.dz-text strong{color:var(--ink);}
+.file-preview{display:none;align-items:center;gap:.75rem;margin-top:.75rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.75rem .9rem;}
+.file-preview.show{display:flex;}
+.fp-name{font-weight:700;font-size:.88rem;}
+.fp-size{font-size:.75rem;color:var(--mint);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr;}}
+.char-count{text-align:right;font-size:.72rem;color:var(--muted);margin-top:.2rem;}
+.empty{text-align:center;padding:3.5rem 1rem;}
+.empty .e-icon{font-size:3.5rem;opacity:.35;margin-bottom:.75rem;}
+.empty h3{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.4rem;}
+.empty p{color:var(--muted);font-size:.88rem;margin-bottom:1.25rem;}
+#toast{position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;padding:.75rem 1.5rem;border-radius:999px;font-family:'Cabinet Grotesk',sans-serif;font-weight:700;font-size:.85rem;opacity:0;pointer-events:none;transition:all .28s ease;z-index:9999;box-shadow:var(--shadow-lg);white-space:nowrap;display:flex;align-items:center;gap:.5rem;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.t-success{border-left:3px solid var(--mint);}
+#toast.t-error{border-left:3px solid var(--red);}
+#toast.t-info{border-left:3px solid var(--saffron);}
+.spinner{width:22px;height:22px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+.spinner-dark{border-color:rgba(26,18,8,.12);border-top-color:var(--ink);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-state{display:flex;justify-content:center;padding:3rem;}
+.modal-bg{position:fixed;inset:0;background:rgba(26,18,8,.55);display:none;align-items:center;justify-content:center;z-index:500;padding:1rem;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--white);border-radius:var(--r-lg);padding:2rem;max-width:420px;width:100%;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{font-family:'Cabinet Grotesk',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.5rem;}
+.modal p{color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;}
+.modal-btns{display:flex;gap:.65rem;justify-content:flex-end;}
+.progress-wrap{background:var(--border);border-radius:999px;overflow:hidden;height:6px;margin-top:.75rem;}
+.progress-bar{height:100%;background:var(--saffron);border-radius:999px;transition:width .3s;width:0%;}
+@media(max-width:768px){.nav-inner{padding:0 1rem;height:56px;}.page-wrap{padding:1.25rem 1rem;}.resource-grid{grid-template-columns:1fr;}.filter-bar{flex-direction:column;}.fb-group{width:100%;}.stats-row{grid-template-columns:repeat(2,1fr);}.nav-link span{display:none;}.nav-link{padding:.4rem .6rem;}}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP SCREEN ══ -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">
+      <div class="icon">🎓</div>
+      <h1>EduVault Setup</h1>
+      <p>Connect your free Supabase project</p>
+    </div>
+    <div style="text-align:center;margin-bottom:1.25rem;">
+      <span class="free-badge">✅ 100% Free · No credit card · Ever</span>
+    </div>
+    <div class="setup-steps">
+      <p>
+        <strong>① Go to</strong> <a href="https://supabase.com" target="_blank">supabase.com</a> → Sign up free (just email)<br/>
+        <strong>② Click</strong> "New project" → give it any name → set a password → Create<br/>
+        <strong>③ Wait</strong> ~1 minute for it to set up<br/>
+        <strong>④ Go to</strong> Project Settings → API → copy the two values below<br/>
+        <strong>⑤ Go to</strong> Storage → Create a bucket named <strong>resources</strong> → make it <strong>Public</strong><br/>
+        <strong>⑥ Go to</strong> Authentication → Providers → Email → make sure it's <strong>enabled</strong>
+      </p>
+    </div>
+    <span class="s-label">Project URL</span>
+    <input class="s-input" id="cfg-url" placeholder="https://xyzcompany.supabase.co"/>
+    <span class="s-label">Anon / Public Key</span>
+    <input class="s-input" id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."/>
+    <button class="btn-connect" onclick="connectSupabase()">🚀 Connect &amp; Launch EduVault</button>
+    <p style="text-align:center;font-size:.75rem;color:rgba(255,255,255,.25);margin-top:1rem;">Saved only in your browser. Never shared with anyone.</p>
+  </div>
+</div>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen">
+  <div class="auth-split">
+    <div class="auth-left">
+      <h2>Your college's knowledge, organised.</h2>
+      <p>Upload notes, find PDFs, download previous year papers — all in one free platform.</p>
+      <div class="feature-rows">
+        <div class="feat-row"><span>📚</span><span>Upload Notes & PDFs</span></div>
+        <div class="feat-row"><span>📝</span><span>Previous Year Papers</span></div>
+        <div class="feat-row"><span>🔍</span><span>Search by subject & semester</span></div>
+        <div class="feat-row"><span>📥</span><span>Free downloads, always</span></div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <h3>Welcome to EduVault</h3>
+      <p>Sign in to access and share study materials</p>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="authTab('login')">Login</button>
+        <button class="tab-btn" onclick="authTab('signup')">Sign Up</button>
+      </div>
+      <div id="auth-err" class="auth-err"></div>
+      <!-- LOGIN -->
+      <div id="panel-login">
+        <div class="form-group"><label class="f-label">Email</label><input type="email" id="l-email" class="f-input" placeholder="you@college.edu"/></div>
+        <div class="form-group"><label class="f-label">Password</label><input type="password" id="l-pass" class="f-input" placeholder="Password"/></div>
+        <button class="btn-auth" id="btn-login" onclick="doLogin()">Login →</button>
+      </div>
+      <!-- SIGNUP -->
+      <div id="panel-signup" style="display:none">
+        <div class="form-group"><label class="f-label">Full Name</label><input type="text" id="s-name" class="f-input" placeholder="Ravi Kumar"/></div>
+        <div class="form-group"><label class="f-label">Email</label><input type="email" id="s-email" class="f-input" placeholder="you@college.edu"/></div>
+        <div class="form-group"><label class="f-label">Password</label><input type="password" id="s-pass" class="f-input" placeholder="Min 6 characters"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+          <div class="form-group"><label class="f-label">Branch</label><input type="text" id="s-branch" class="f-input" placeholder="CS, EC, ME…"/></div>
+          <div class="form-group"><label class="f-label">Semester</label>
+            <select id="s-sem" class="f-select">
+              <option value="1">Sem 1</option><option value="2">Sem 2</option><option value="3" selected>Sem 3</option>
+              <option value="4">Sem 4</option><option value="5">Sem 5</option><option value="6">Sem 6</option>
+              <option value="7">Sem 7</option><option value="8">Sem 8</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-auth" id="btn-signup" onclick="doSignup()" style="background:var(--saffron)">Create Account →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app-screen">
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand"><div class="dot">🎓</div>EduVault</div>
+      <div class="nav-links">
+        <button class="nav-link active" onclick="showPage('dashboard')" id="nl-dashboard">🏠 <span>Home</span></button>
+        <button class="nav-link" onclick="showPage('browse')" id="nl-browse">🔍 <span>Browse</span></button>
+        <button class="nav-link" onclick="showPage('upload')" id="nl-upload">⬆️ <span>Upload</span></button>
+        <div class="nav-avatar" id="nav-avatar" title="Logout" onclick="doLogout()" style="background:var(--saffron)"></div>
+      </div>
+    </div>
+  </nav>
+  <div class="page-wrap">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-header">
+        <h1 id="dash-greeting">Welcome! 👋</h1>
+        <p>Here's what's happening on EduVault today.</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="s-icon">📤</div><div class="s-val" id="st-uploads">—</div><div class="s-lbl">My Uploads</div></div>
+        <div class="stat-box"><div class="s-icon">📥</div><div class="s-val" id="st-dls">—</div><div class="s-lbl">Total Downloads</div></div>
+        <div class="stat-box"><div class="s-icon">👥</div><div class="s-val" id="st-total">—</div><div class="s-lbl">All Resources</div></div>
+        <div class="stat-box"><div class="s-icon">🔥</div><div class="s-val" id="st-today">—</div><div class="s-lbl">Added Today</div></div>
+      </div>
+      <div class="quick-acts">
+        <button class="btn btn-saffron btn-lg" onclick="showPage('upload')">⬆️ Upload Resource</button>
+        <button class="btn btn-outline btn-lg" onclick="showPage('browse')">🔍 Browse All</button>
+      </div>
+      <div class="section-title">My Uploads <button class="btn btn-ghost btn-sm" onclick="showPage('upload')">+ Add New</button></div>
+      <div id="dash-loading" class="loading-state"><div class="spinner spinner-dark"></div></div>
+      <div id="dash-empty" class="empty" style="display:none">
+        <div class="e-icon">📂</div><h3>No uploads yet</h3>
+        <p>Share your notes and help your classmates score better!</p>
+        <button class="btn btn-saffron" onclick="showPage('upload')">Upload Your First Resource</button>
+      </div>
+      <div id="dash-grid" class="resource-grid" style="display:none"></div>
+    </div>
+
+    <!-- BROWSE -->
+    <div class="page" id="page-browse">
+      <div class="dash-header"><h1>Browse Resources 🔍</h1><p>Find notes, PDFs and papers from your classmates.</p></div>
+      <div class="filter-bar">
+        <div class="fb-group fb-search" style="flex:3;min-width:200px">
+          <label>Search</label>
+          <div class="fb-search-wrap"><input type="text" id="f-search" placeholder="Title, subject…" oninput="onFilterChange()"/></div>
+        </div>
+        <div class="fb-group" style="min-width:130px"><label>Semester</label>
+          <select id="f-sem" onchange="onFilterChange()">
+            <option value="">All</option><option value="1">Sem 1</option><option value="2">Sem 2</option>
+            <option value="3">Sem 3</option><option value="4">Sem 4</option><option value="5">Sem 5</option>
+            <option value="6">Sem 6</option><option value="7">Sem 7</option><option value="8">Sem 8</option>
+          </select>
+        </div>
+        <div class="fb-group" style="min-width:150px"><label>Type</label>
+          <select id="f-type" onchange="onFilterChange()">
+            <option value="">All Types</option><option value="Notes">📝 Notes</option>
+            <option value="Previous Year Paper">📄 PYQ Paper</option><option value="Assignment">📋 Assignment</option>
+            <option value="Textbook">📚 Textbook</option><option value="Other">📌 Other</option>
+          </select>
+        </div>
+        <div class="fb-group" style="min-width:150px"><label>Subject</label>
+          <input type="text" id="f-subj" placeholder="e.g. Maths" oninput="onFilterChange()"/>
+        </div>
+        <div class="fb-group" style="min-width:auto"><label>&nbsp;</label>
+          <button class="btn btn-ghost btn-sm" onclick="clearFilters()">✕ Clear</button>
+        </div>
+      </div>
+      <div id="browse-count" class="results-count"></div>
+      <div id="browse-loading" class="loading-state" style="display:none"><div class="spinner spinner-dark"></div></div>
+      <div id="browse-empty" class="empty" style="display:none">
+        <div class="e-icon">📭</div><h3>No resources found</h3>
+        <p>Try different filters, or be the first to upload!</p>
+        <button class="btn btn-saffron" onclick="showPage('upload')">Upload a Resource</button>
+      </div>
+      <div id="browse-grid" class="resource-grid"></div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="page" id="page-upload">
+      <div class="dash-header"><h1>Upload a Resource ⬆️</h1><p>Share your notes and PDFs with fellow students.</p></div>
+      <div class="upload-wrap">
+        <div id="upload-success" style="display:none;text-align:center;padding:3rem 1rem">
+          <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
+          <h2 style="font-family:'Cabinet Grotesk',sans-serif;font-weight:900;">Uploaded!</h2>
+          <p style="color:var(--muted);margin:.6rem 0 1.5rem">Your resource is now live for everyone to download.</p>
+          <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-saffron btn-lg" onclick="resetUpload()">Upload Another</button>
+            <button class="btn btn-outline btn-lg" onclick="showPage('browse')">Browse Resources</button>
+          </div>
+        </div>
+        <div id="upload-form-wrap" class="upload-card">
+          <div id="upload-err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:var(--red);border-radius:8px;padding:.65rem .9rem;font-size:.82rem;margin-bottom:1rem;"></div>
+          <div class="form-group">
+            <label class="f-label">File <span style="color:var(--red)">*</span></label>
+            <div class="drop-zone" id="dz" onclick="document.getElementById('file-inp').click()"
+                 ondragover="dzDragOver(event)" ondragleave="dzDragLeave(event)" ondrop="dzDrop(event)">
+              <input type="file" id="file-inp" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" onchange="onFileSelect(event)"/>
+              <div id="dz-default"><div class="dz-icon">📂</div>
+                <p class="dz-text"><strong>Click to browse</strong> or drag &amp; drop<br/>PDF, DOCX, PPTX, JPG, PNG · Max 50 MB</p>
+              </div>
+            </div>
+            <div class="file-preview" id="fp">
+              <span id="fp-icon" style="font-size:1.4rem"></span>
+              <div><div class="fp-name" id="fp-name"></div><div class="fp-size" id="fp-size"></div></div>
+              <button class="btn btn-ghost btn-sm" onclick="clearFile()" style="margin-left:auto">✕</button>
+            </div>
+            <div class="progress-wrap" id="prog-wrap" style="display:none"><div class="progress-bar" id="prog-bar"></div></div>
+          </div>
+          <div class="form-group"><label class="f-label">Title <span style="color:var(--red)">*</span></label>
+            <input type="text" id="u-title" class="f-input" placeholder="e.g. Data Structures Unit 3 Notes" maxlength="120"/>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="f-label">Subject <span style="color:var(--red)">*</span></label>
+              <input type="text" id="u-subj" class="f-input" placeholder="e.g. Data Structures" list="subj-list"/>
+              <datalist id="subj-list">
+                <option value="Data Structures"><option value="Algorithms"><option value="Operating Systems">
+                <option value="Database Management"><option value="Computer Networks"><option value="Mathematics">
+                <option value="Physics"><option value="Chemistry"><option value="Software Engineering">
+              </datalist>
+            </div>
+            <div class="form-group"><label class="f-label">Semester <span style="color:var(--red)">*</span></label>
+              <select id="u-sem" class="f-select">
+                <option value="" disabled selected>Choose</option>
+                <option value="1">Sem 1</option><option value="2">Sem 2</option><option value="3">Sem 3</option>
+                <option value="4">Sem 4</option><option value="5">Sem 5</option><option value="6">Sem 6</option>
+                <option value="7">Sem 7</option><option value="8">Sem 8</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label class="f-label">Resource Type</label>
+            <select id="u-type" class="f-select">
+              <option value="Notes">📝 Notes</option><option value="Previous Year Paper">📄 Previous Year Paper</option>
+              <option value="Assignment">📋 Assignment</option><option value="Textbook">📚 Textbook</option><option value="Other">📌 Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="f-label">Description <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+            <textarea id="u-desc" class="f-input" style="resize:vertical;min-height:80px" placeholder="Topics covered, unit number…" maxlength="400"
+              oninput="document.getElementById('desc-cnt').textContent=this.value.length"></textarea>
+            <div class="char-count"><span id="desc-cnt">0</span>/400</div>
+          </div>
+          <button class="btn btn-saffron" id="btn-upload" onclick="doUpload()" style="width:100%;padding:.85rem;font-size:1rem;">⬆️ Upload Resource</button>
+        </div>
+        <div class="upload-card" style="margin-top:1rem;background:#fdfcfa;">
+          <p style="font-weight:700;font-size:.9rem;margin-bottom:.6rem">📌 Tips for great uploads</p>
+          <ul style="list-style:disc;padding-left:1.25rem;color:var(--muted);font-size:.82rem;line-height:2.1">
+            <li>Include unit/chapter number in the title</li>
+            <li>Always pick the correct semester</li>
+            <li>Add a short description so others know what's inside</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-bg" id="del-modal">
+  <div class="modal">
+    <h3>Delete this resource?</h3>
+    <p>The file will be permanently removed. This cannot be undone.</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeDelModal()">Cancel</button>
+      <button class="btn btn-danger" id="btn-del-confirm" onclick="confirmDelete()">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ─────────────────────────────────────────────────────────────
+// SUPABASE CLIENT (initialized after config is entered)
+// ─────────────────────────────────────────────────────────────
+let supabaseClient = null;
+let currentUser = null;
+let allResources = [];
+let deleteTarget = null;
+let selectedFile = null;
+
+const COLOURS = ['#e8880a','#1cb87e','#2563eb','#7c3aed','#e84040','#0891b2'];
+const strColour = s => COLOURS[(s||'').charCodeAt(0) % COLOURS.length];
+
+// ── CONNECT ──────────────────────────────────────────────────
+window.connectSupabase = async () => {
+  const url = document.getElementById('cfg-url').value.trim();
+  const key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { showToast('⚠️ Please fill in both fields', 't-error'); return; }
+  try {
+    supabaseClient = window.supabase.createClient(url, key);
+    // Test the connection
+    await supabaseClient.from('resources').select('id').limit(1);
+    localStorage.setItem('ev_url', url);
+    localStorage.setItem('ev_key', key);
+    showToast('✅ Connected to Supabase!', 't-success');
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display  = 'flex';
+    listenAuth();
+  } catch(e) {
+    // Connection still works even if table doesn't exist yet
+    localStorage.setItem('ev_url', url);
+    localStorage.setItem('ev_key', key);
+    supabaseClient = window.supabase.createClient(url, key);
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display  = 'flex';
+    listenAuth();
+  }
+};
+
+// ── AUTH LISTENER ─────────────────────────────────────────────
+function listenAuth() {
+  supabaseClient.auth.getSession().then(({ data }) => {
+    if (data.session) onUserLogin(data.session.user);
+  });
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session) onUserLogin(session.user);
+    else onUserLogout();
+  });
+}
+
+function onUserLogin(user) {
+  currentUser = user;
+  const name = user.user_metadata?.name || user.email || 'Student';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display  = 'flex';
+  const av = document.getElementById('nav-avatar');
+  av.textContent = name[0].toUpperCase();
+  av.style.background = strColour(name);
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greeting').textContent = `${g}, ${name.split(' ')[0]}! ${h<12?'☀️':h<17?'🌤️':'🌙'}`;
+  loadDashboard();
+  loadAllResources();
+}
+
+function onUserLogout() {
+  currentUser = null;
+  document.getElementById('app-screen').style.display  = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+// ── AUTH ACTIONS ──────────────────────────────────────────────
+window.doSignup = async () => {
+  const name  = document.getElementById('s-name').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const pass  = document.getElementById('s-pass').value;
+  if (!name||!email||!pass) { showAuthErr('Name, email and password are required.'); return; }
+  if (pass.length < 6)      { showAuthErr('Password must be at least 6 characters.'); return; }
+  setBtnLoading('btn-signup', true, 'Creating account…');
+  const { error } = await supabaseClient.auth.signUp({
+    email, password: pass,
+    options: { data: { name, branch: document.getElementById('s-branch').value, semester: document.getElementById('s-sem').value } }
+  });
+  if (error) { showAuthErr(error.message); setBtnLoading('btn-signup', false, 'Create Account →'); }
+  else showToast('Check your email to confirm your account! Or login directly.', 't-info');
+};
+
+window.doLogin = async () => {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  if (!email||!pass) { showAuthErr('Email and password are required.'); return; }
+  setBtnLoading('btn-login', true, 'Logging in…');
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  if (error) { showAuthErr(error.message); setBtnLoading('btn-login', false, 'Login →'); }
+};
+
+window.doLogout = async () => {
+  if (!confirm('Log out of EduVault?')) return;
+  await supabaseClient.auth.signOut();
+};
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
+  document.getElementById('dash-loading').style.display = 'flex';
+  document.getElementById('dash-grid').style.display    = 'none';
+  document.getElementById('dash-empty').style.display   = 'none';
+  try {
+    const uid = currentUser.id;
+    // My uploads
+    const { data: myDocs } = await supabaseClient.from('resources').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+    const safe = myDocs || [];
+    document.getElementById('st-uploads').textContent = safe.length;
+    document.getElementById('st-dls').textContent = safe.reduce((s,r) => s+(r.downloads||0), 0);
+    // Total
+    const { count } = await supabaseClient.from('resources').select('*', { count: 'exact', head: true });
+    document.getElementById('st-total').textContent = count || 0;
+    // Today
+    const today = new Date(); today.setHours(0,0,0,0);
+    const { count: todayCount } = await supabaseClient.from('resources').select('*', { count: 'exact', head: true }).gte('created_at', today.toISOString());
+    document.getElementById('st-today').textContent = todayCount || 0;
+
+    document.getElementById('dash-loading').style.display = 'none';
+    if (safe.length === 0) { document.getElementById('dash-empty').style.display = 'block'; }
+    else {
+      const grid = document.getElementById('dash-grid');
+      grid.innerHTML = safe.map(r => renderCard(r, true)).join('');
+      grid.style.display = 'grid';
+    }
+  } catch(e) {
+    document.getElementById('dash-loading').style.display = 'none';
+    // Table might not exist yet — show empty state
+    document.getElementById('st-uploads').textContent = '0';
+    document.getElementById('st-dls').textContent = '0';
+    document.getElementById('st-total').textContent = '0';
+    document.getElementById('st-today').textContent = '0';
+    document.getElementById('dash-empty').style.display = 'block';
+  }
+}
+
+// ── BROWSE ────────────────────────────────────────────────────
+async function loadAllResources() {
+  document.getElementById('browse-loading').style.display = 'flex';
+  try {
+    const { data } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: false });
+    allResources = data || [];
+    renderBrowse(allResources);
+  } catch(e) { allResources = []; renderBrowse([]); }
+  finally { document.getElementById('browse-loading').style.display = 'none'; }
+}
+
+function renderBrowse(list) {
+  document.getElementById('browse-count').textContent = list.length === 0 ? '' : `${list.length} resource${list.length!==1?'s':''} found`;
+  document.getElementById('browse-empty').style.display = list.length === 0 ? 'block' : 'none';
+  document.getElementById('browse-grid').innerHTML = list.map(r => renderCard(r, false)).join('');
+}
+
+window.onFilterChange = () => {
+  const search = document.getElementById('f-search').value.toLowerCase();
+  const sem    = document.getElementById('f-sem').value;
+  const type   = document.getElementById('f-type').value;
+  const subj   = document.getElementById('f-subj').value.toLowerCase();
+  renderBrowse(allResources.filter(r => {
+    if (sem  && String(r.semester) !== sem)                    return false;
+    if (type && r.resource_type !== type)                      return false;
+    if (subj && !r.subject?.toLowerCase().includes(subj))      return false;
+    if (search && !r.title?.toLowerCase().includes(search) &&
+        !r.subject?.toLowerCase().includes(search) &&
+        !r.description?.toLowerCase().includes(search))       return false;
+    return true;
+  }));
+};
+
+window.clearFilters = () => {
+  ['f-search','f-subj'].forEach(id => document.getElementById(id).value='');
+  ['f-sem','f-type'].forEach(id => document.getElementById(id).value='');
+  renderBrowse(allResources);
+};
+
+// ── UPLOAD ────────────────────────────────────────────────────
+window.onFileSelect = e => setFile(e.target.files[0]);
+window.dzDragOver  = e => { e.preventDefault(); document.getElementById('dz').classList.add('drag'); };
+window.dzDragLeave = ()  => document.getElementById('dz').classList.remove('drag');
+window.dzDrop      = e  => { e.preventDefault(); document.getElementById('dz').classList.remove('drag'); setFile(e.dataTransfer.files[0]); };
+
+function setFile(file) {
+  if (!file) return;
+  if (file.size > 50*1024*1024) { showToast('❌ File too large (max 50 MB)', 't-error'); return; }
+  selectedFile = file;
+  document.getElementById('dz-default').style.display = 'none';
+  document.getElementById('dz').classList.add('has-file');
+  const {icon} = fileIcon(file.type);
+  document.getElementById('fp-icon').textContent = icon;
+  document.getElementById('fp-name').textContent = file.name;
+  document.getElementById('fp-size').textContent = fmtSize(file.size);
+  document.getElementById('fp').classList.add('show');
+}
+
+window.clearFile = () => {
+  selectedFile = null;
+  document.getElementById('file-inp').value = '';
+  document.getElementById('dz').classList.remove('has-file','drag');
+  document.getElementById('dz-default').style.display = '';
+  document.getElementById('fp').classList.remove('show');
+  document.getElementById('prog-wrap').style.display = 'none';
+  document.getElementById('prog-bar').style.width = '0%';
+};
+
+window.doUpload = async () => {
+  hideUploadErr();
+  if (!selectedFile) { showUploadErr('Please select a file.'); return; }
+  const title = document.getElementById('u-title').value.trim();
+  const subj  = document.getElementById('u-subj').value.trim();
+  const sem   = document.getElementById('u-sem').value;
+  if (!title||!subj||!sem) { showUploadErr('Title, subject and semester are required.'); return; }
+
+  const btn = document.getElementById('btn-upload');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Uploading…';
+  document.getElementById('prog-wrap').style.display = 'block';
+  document.getElementById('prog-bar').style.width = '30%';
+
+  try {
+    // 1. Upload file to Supabase Storage
+    const ext      = selectedFile.name.split('.').pop();
+    const filePath = `${currentUser.id}/${Date.now()}.${ext}`;
+    const { error: upErr } = await supabaseClient.storage.from('resources').upload(filePath, selectedFile, { cacheControl: '3600', upsert: false });
+    if (upErr) throw upErr;
+
+    document.getElementById('prog-bar').style.width = '70%';
+
+    // 2. Get public URL
+    const { data: urlData } = supabaseClient.storage.from('resources').getPublicUrl(filePath);
+    const publicUrl = urlData.publicUrl;
+
+    document.getElementById('prog-bar').style.width = '85%';
+
+    // 3. Save metadata to Supabase DB
+    const { error: dbErr } = await supabaseClient.from('resources').insert({
+      title,
+      subject:       subj,
+      semester:      parseInt(sem),
+      resource_type: document.getElementById('u-type').value,
+      description:   document.getElementById('u-desc').value.trim(),
+      file_name:     selectedFile.name,
+      file_size:     selectedFile.size,
+      file_type:     selectedFile.type,
+      file_url:      publicUrl,
+      storage_path:  filePath,
+      user_id:       currentUser.id,
+      uploader_name: currentUser.user_metadata?.name || currentUser.email,
+      downloads:     0,
+    });
+    if (dbErr) throw dbErr;
+
+    document.getElementById('prog-bar').style.width = '100%';
+    setTimeout(() => {
+      document.getElementById('upload-form-wrap').style.display = 'none';
+      document.getElementById('upload-success').style.display   = 'block';
+      loadDashboard();
+      loadAllResources();
+    }, 400);
+  } catch(e) {
+    showUploadErr('Upload failed: ' + (e.message || 'Please check your Supabase storage bucket is named "resources" and is public.'));
+    btn.disabled = false;
+    btn.innerHTML = '⬆️ Upload Resource';
+    document.getElementById('prog-wrap').style.display = 'none';
+  }
+};
+
+window.resetUpload = () => {
+  document.getElementById('upload-success').style.display   = 'none';
+  document.getElementById('upload-form-wrap').style.display = 'block';
+  ['u-title','u-subj','u-desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('u-sem').value  = '';
+  document.getElementById('u-type').value = 'Notes';
+  document.getElementById('desc-cnt').textContent = '0';
+  document.getElementById('prog-wrap').style.display = 'none';
+  document.getElementById('prog-bar').style.width    = '0%';
+  clearFile();
+  const btn = document.getElementById('btn-upload');
+  btn.disabled = false;
+  btn.innerHTML = '⬆️ Upload Resource';
+};
+
+// ── DOWNLOAD ──────────────────────────────────────────────────
+window.downloadResource = async (id, url, fname) => {
+  if (!url) { showToast('Download link not available', 't-error'); return; }
+  try { await supabaseClient.from('resources').update({ downloads: allResources.find(r=>r.id===id)?.downloads + 1 || 1 }).eq('id', id); } catch(_){}
+  const a = document.createElement('a');
+  a.href = url; a.target = '_blank'; a.download = fname || 'resource';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  showToast('⬇️ Download started!', 't-success');
+  loadDashboard(); loadAllResources();
+};
+
+// ── DELETE ────────────────────────────────────────────────────
+window.openDelModal = (id, path) => {
+  deleteTarget = { id, path };
+  document.getElementById('del-modal').classList.add('show');
+};
+window.closeDelModal = () => {
+  deleteTarget = null;
+  document.getElementById('del-modal').classList.remove('show');
+};
+window.confirmDelete = async () => {
+  if (!deleteTarget) return;
+  const btn = document.getElementById('btn-del-confirm');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    if (deleteTarget.path) {
+      try { await supabaseClient.storage.from('resources').remove([deleteTarget.path]); } catch(_){}
+    }
+    await supabaseClient.from('resources').delete().eq('id', deleteTarget.id);
+    showToast('Resource deleted', 't-success');
+    closeDelModal();
+    loadDashboard();
+    loadAllResources();
+  } catch(e) {
+    showToast('Delete failed: ' + e.message, 't-error');
+  } finally {
+    btn.disabled = false; btn.innerHTML = '🗑️ Delete';
+  }
+};
+
+// ── RENDER CARD ───────────────────────────────────────────────
+function renderCard(r, showDelete) {
+  const {icon, cls} = fileIcon(r.file_type);
+  const isOwner = r.user_id === currentUser?.id;
+  const delBtn = (showDelete || isOwner)
+    ? `<button class="btn btn-danger btn-sm" onclick="openDelModal('${r.id}','${esc(r.storage_path||'')}')">🗑️</button>`
+    : '';
+  return `
+    <div class="res-card">
+      <div class="res-card-top">
+        <div class="res-icon ${cls}">${icon}</div>
+        <div class="res-title" title="${esc(r.title)}">${esc(r.title)}</div>
+        <div class="res-chips">
+          <span class="chip chip-saf">${esc(r.subject)}</span>
+          <span class="chip chip-ink">Sem ${r.semester}</span>
+          <span class="chip chip-blue">${esc(r.resource_type||'Notes')}</span>
+        </div>
+        ${r.description ? `<div class="res-desc">${esc(r.description)}</div>` : ''}
+      </div>
+      <div class="res-card-bot">
+        <div class="res-meta-info">
+          <div>👤 ${esc(r.uploader_name||'Anonymous')}</div>
+          <div>📥 ${r.downloads||0} · ${fmtSize(r.file_size)}</div>
+        </div>
+        <div style="display:flex;gap:.35rem;align-items:center">
+          <button class="btn btn-primary btn-sm" onclick="downloadResource('${r.id}','${esc(r.file_url||'')}','${esc(r.file_name||'')}')">⬇️</button>
+          ${delBtn}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function fileIcon(type='') {
+  if (type.includes('pdf'))        return {icon:'📕',cls:'ri-pdf'};
+  if (type.includes('word')||type.includes('document')) return {icon:'📘',cls:'ri-doc'};
+  if (type.includes('presentation')||type.includes('powerpoint')) return {icon:'📙',cls:'ri-ppt'};
+  if (type.includes('image'))      return {icon:'🖼️',cls:'ri-img'};
+  return {icon:'📄',cls:'ri-other'};
+}
+function fmtSize(b) {
+  if (!b) return '';
+  const k=['B','KB','MB','GB'],i=Math.floor(Math.log(b)/Math.log(1024));
+  return (b/Math.pow(1024,i)).toFixed(1)+' '+k[i];
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showAuthErr(msg) { const el=document.getElementById('auth-err'); el.textContent='⚠️ '+msg; el.style.display='block'; }
+function showUploadErr(msg) { const el=document.getElementById('upload-err'); el.textContent='⚠️ '+msg; el.style.display='block'; el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+function hideUploadErr() { document.getElementById('upload-err').style.display='none'; }
+function setBtnLoading(id,loading,text) { const b=document.getElementById(id); b.disabled=loading; b.innerHTML=loading?`<span class="spinner"></span> ${text}`:text; }
+
+// ── PAGE NAV ──────────────────────────────────────────────────
+window.showPage = name => {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nl-'+name).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+window.authTab = tab => {
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0)===(tab==='login')));
+  document.getElementById('panel-login').style.display  = tab==='login' ?'':'none';
+  document.getElementById('panel-signup').style.display = tab==='signup'?'':'none';
+  document.getElementById('auth-err').style.display='none';
+};
+
+// ── TOAST ─────────────────────────────────────────────────────
+window.showToast = (msg, type='t-info') => {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+type;
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>{t.className='';},3500);
+};
+
+// ── MODAL BACKDROP ────────────────────────────────────────────
+document.getElementById('del-modal').addEventListener('click',function(e){if(e.target===this)closeDelModal();});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  if(document.getElementById('panel-login').style.display!=='none') doLogin();
+  else doSignup();
+});
+
+// ── AUTO-CONNECT if config saved ─────────────────────────────
+const savedUrl = localStorage.getItem('ev_url');
+const savedKey = localStorage.getItem('ev_key');
+if (savedUrl && savedKey) {
+  document.getElementById('cfg-url').value = savedUrl;
+  document.getElementById('cfg-key').value = savedKey;
+  supabaseClient = window.supabase.createClient(savedUrl, savedKey);
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display  = 'flex';
+  listenAuth();
+}
+</script>
+</body>
+</html>
